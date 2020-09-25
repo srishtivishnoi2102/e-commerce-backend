@@ -3,7 +3,7 @@ const { db } = require("../lib/datacentre/mysql");
 const Customer = require("./customer");
 
 
-const Address = db.define( "customer", {
+const Address = db.define( "address", {
     id : {
         type : DataTypes.INTEGER,
         allowNull: false,

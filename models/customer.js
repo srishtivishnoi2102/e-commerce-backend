@@ -37,8 +37,8 @@ const Customer = db.define( "customer", {
 
     encryptedPassword : {
         type : DataTypes.STRING,
-        allowNull : false,        
-    }
+        allowNull : false,        address
+    },
 
 })
 
