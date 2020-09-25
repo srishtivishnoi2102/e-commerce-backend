@@ -1,0 +1,27 @@
+{
+  "name": "e-commerce-backend-",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/srishtivishnoi2102/e-commerce-backend-.git"
+  },
+  "author": "Srishti Vishnoi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/srishtivishnoi2102/e-commerce-backend-/issues"
+  },
+  "homepage": "https://github.com/srishtivishnoi2102/e-commerce-backend-#readme",
+  "dependencies": {
+    "await-to-js": "^2.1.1",
+    "express": "^4.17.1",
+    "sequelize": "^6.3.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
+}
