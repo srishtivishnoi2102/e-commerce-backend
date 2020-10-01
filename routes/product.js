@@ -12,5 +12,11 @@ router.get('/:product_id/', productController.getProductById );
 
 router.get('/inCategory/:category_id', productController.getAllProductsWithCategoryId );
 
+router.get('/:product_id/details', productController.getProductDetails );
+
+router.get('/:product_id/reviews', productController.getProductReviews );
+
+router.post('/:product_id/reviews', productController.postReview );
+
 
 module.exports = router;
