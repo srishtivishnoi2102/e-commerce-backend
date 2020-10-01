@@ -5,8 +5,8 @@ const { isNormalInteger } = require("../lib/utils/helper");
 
 
 const categoryValidator = require('../lib/PayloadValidation/category');
-const categoryModel = require('../models/category');
-const ProductModel = require('../models/product');
+const categoryModel = require('../lib/datacentre/models/category');
+const ProductModel = require('../lib/datacentre/models/product');
 
 const addCategory = async(req, res) =>{
     let err, result;

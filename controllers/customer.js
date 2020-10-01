@@ -5,10 +5,11 @@ const jwt = require('jsonwebtoken');
 const { dbError, sendResponse, invalidPayloadError } = require("../lib/utils/error_handler");
 
 const customerValidator = require('../lib/PayloadValidation/customer');
-const customerModel = require('../models/customer');
+const customerModel = require('../lib/datacentre/models/customer');
 
 
-const salt = 'c3Jpc2h0aQo';
+const salt = process.env.SALT;
+const saltRounds =parseInt( process.env.SALT_ROUNDS);
 
 
 const generateJWToken = (customer) =>{
@@ -21,22 +22,19 @@ const generateJWToken = (customer) =>{
     return token;
 }
 
-const getCustomerById = async(req, res) => {
-    let err, result;
-    const id =parseInt(req.customer.id);
 
-    [err, result] = await to(customerModel.findByPk(id));
+const encryptPassword = async(password) => {
 
+    const [err,encryptedPassword] = await to(bcrypt.hash(password, saltRounds));
 
     if(err){
-        dbError(res, err);
+        console.log("Error while generating password hash",{error:err});
+        throw Error('Error while generating password hash');
     }
-    
-    console.log("customer ",req.customer.id);
+    return encryptedPassword;
 
-    sendResponse(res, result);
+}
 
-};
 
 const registerCustomer = async(req, res) => {
     let err, result;
@@ -124,18 +122,6 @@ const registerCustomer = async(req, res) => {
 
 };
 
-const encryptPassword = async(password) => {
-    const saltRounds = 12;
-    const [err,encryptedPassword] = await to(bcrypt.hash(password, saltRounds));
-    console.log("encryptedPassword::",encryptedPassword);
-    if(err){
-        console.log("Error while generating password hash",{error:err});
-        throw Error('Error while generating password hash');
-    }
-    return encryptedPassword;
-
-}
-
 const loginCustomer = async(req, res) => {
     let err, result;
     let {email, password}= req.body;
@@ -218,6 +204,25 @@ const loginCustomer = async(req, res) => {
    
 
 }
+
+
+const getCustomerById = async(req, res) => {
+    let err, result;
+    const id =parseInt(req.customer.id);
+
+    [err, result] = await to(customerModel.findByPk(id));
+
+
+    if(err){
+        dbError(res, err);
+    }
+    
+    console.log("customer ",req.customer.id);
+
+    sendResponse(res, result);
+
+};
+
 
 const updateCreditCard = async(req, res) => {
     let err, result;
