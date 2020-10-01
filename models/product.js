@@ -1,6 +1,7 @@
-const { Sequelize , DataTypes} = require("sequelize/types");
+const { Sequelize , DataTypes} = require("sequelize");
 const { db } = require("../lib/datacentre/mysql");
 const Category = require("./category");
+
 
 
 const Product = db.define( "product", {
@@ -12,11 +13,11 @@ const Product = db.define( "product", {
     },
 
     categoryId : {
-        type : DataTypes.STRING,
+        type : DataTypes.INTEGER,
         allowNull : false,
         references : {
             model : Category,
-            key : 'id',
+            key : Category.id,
         },
         
     },
@@ -28,7 +29,7 @@ const Product = db.define( "product", {
 
     description : {
         type : DataTypes.STRING,
-        allowNull : false,
+        defaultValue : null,
     },
 
     price : {

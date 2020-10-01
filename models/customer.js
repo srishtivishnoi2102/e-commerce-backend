@@ -1,4 +1,5 @@
-const { Sequelize , DataTypes} = require("sequelize/types");
+const { number } = require("joi");
+const { Sequelize , DataTypes} = require("sequelize");
 const { db } = require("../lib/datacentre/mysql");
 
 
@@ -23,23 +24,32 @@ const Customer = db.define( "customer", {
         
     },
 
-    dob : {
-        type : DataTypes.DATE,
-        allowNull : false,
-    },
 
     mobileNumber : {
         type : DataTypes.STRING(10),
-        unique : true,
         allowNull : false,
+        unique : true,
         
     },
 
     encryptedPassword : {
         type : DataTypes.STRING,
-        allowNull : false,        address
+        allowNull : false,        
     },
 
+    isLoggedIn : {
+        type : DataTypes.BOOLEAN,
+        defaultValue : true,
+    },
+
+    creditCardNumber : {
+        type : DataTypes.BIGINT(16),
+        defaultValue : null,
+    },
+    address : {
+        type : DataTypes.STRING(),
+        defaultValue : null,
+    }
 })
 
 

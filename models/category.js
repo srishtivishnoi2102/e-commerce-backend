@@ -1,4 +1,4 @@
-const { Sequelize , DataTypes} = require("sequelize/types");
+const { Sequelize , DataTypes} = require("sequelize");
 const { db } = require("../lib/datacentre/mysql");
 
 
@@ -15,6 +15,11 @@ const Category = db.define( "category", {
         type : DataTypes.STRING,
         allowNull : false,        
     },
+    description  :{
+        type : DataTypes.STRING,
+        allowNull :true,
+        defaultValue : "",
+    }
 
 
 

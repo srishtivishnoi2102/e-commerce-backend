@@ -1,13 +1,18 @@
 const express = require('express');
+const bodyParser=require('body-parser');
 const { db_connect } = require('./lib/datacentre/mysql');
-
-
+const routes = require('./routes/route');
 
 const app = express();
 
 db_connect();
 
-const PORT = 4000;
+app.use(express.json());
+app.use(bodyParser.json());
+
+app.use('/', routes);
+
+const PORT = 3040;
 app.listen(PORT, () => {
     console.log(`Server started on port`);
 });
