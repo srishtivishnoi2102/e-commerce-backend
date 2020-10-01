@@ -1,4 +1,4 @@
-const ProductModel = require("../models/product");
+const ProductModel = require("../lib/datacentre/models/product");
 const ProductValidator = require("../lib/PayloadValidation/product");
 const { default: to } = require("await-to-js");
 const { invalidPayloadError, dbError, sendResponse } = require("../lib/utils/error_handler");
