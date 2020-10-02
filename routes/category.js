@@ -8,10 +8,10 @@ const router = express.Router();
 
 router.post('/',checkToken, categoryController.addCategory);
 
-router.get('/',checkToken, categoryController.getCategories);
+router.get('/', categoryController.getCategories);
 
-router.get('/:category_id',checkToken, categoryController.getCategoryById );
+router.get('/:category_id', categoryController.getCategoryById );
 
-router.get('/inProduct/:product_id',checkToken, categoryController.getCategoriesOfProduct );
+router.get('/inProduct/:product_id', categoryController.getCategoriesOfProduct );
 
 module.exports = router ;

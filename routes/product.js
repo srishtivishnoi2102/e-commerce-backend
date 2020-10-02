@@ -3,8 +3,7 @@ const router = express.Router();
 const productController = require('../controllers/product');
 const checkToken = require('../lib/middleware/authention');
 
-
-router.post('/', productController.postProduct );
+router.post('/', checkToken, productController.postProduct );
 
 router.get('/', productController.getAllProducts );
 
@@ -16,7 +15,6 @@ router.get('/:product_id/details', productController.getProductDetails );
 
 router.get('/:product_id/reviews', productController.getProductReviews );
 
-router.post('/:product_id/reviews', productController.postReview );
-
+router.post('/:product_id/reviews',checkToken, productController.postReview );
 
 module.exports = router;

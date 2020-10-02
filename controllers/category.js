@@ -1,5 +1,4 @@
 const { default: to } = require("await-to-js");
-const { db } = require("../lib/datacentre/mysql");
 const { dbError, sendResponse, invalidPayloadError } = require("../lib/utils/error_handler");
 const { isNormalInteger } = require("../lib/utils/helper");
 
@@ -14,7 +13,7 @@ const addCategory = async(req, res) =>{
     if(err){
         return invalidPayloadError(res, err);
     }
-    
+    categoryModel.f
 
     [err, result ] = await to(categoryModel.create(req.body));
 
