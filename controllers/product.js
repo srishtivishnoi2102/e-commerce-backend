@@ -1,11 +1,15 @@
 const ProductModel = require("../lib/datacentre/models/product");
+const ReviewModel = require("../lib/datacentre/models/review");
 const ProductValidator = require("../lib/PayloadValidation/product");
+const ReviewValidator = require("../lib/PayloadValidation/review");
 const { default: to } = require("await-to-js");
 const { invalidPayloadError, dbError, sendResponse } = require("../lib/utils/error_handler");
 const { isNormalInteger } = require("../lib/utils/helper");
 
 const postProduct = async(req, res) => {
     let err, result;
+    let productDetails = req.body.specifications;
+    delete req.body.specifications;
 
     [err, result]= await to(ProductValidator.newProduct.validateAsync(req.body));
     if(err){
@@ -33,7 +37,12 @@ const postProduct = async(req, res) => {
    [err, result ] = await to(ProductModel.create(req.body));
    if(err){
        return dbError(res, err);
-   }
+    }
+
+    const pid = result.dataValues.id;
+    console.log(productDetails, pid);
+
+
    sendResponse(res, result);
 
 }
@@ -115,10 +124,78 @@ const getAllProductsWithCategoryId = async(req, res) => {
     return sendResponse(res, result);
 }
 
+const getProductDetails = async(req, res) => {
+    const pid = req.params.product_id;
+
+    let err, result;
+    if(!isNormalInteger(pid)){
+        return res.json({
+            success : false,
+            pid,
+            message : "Invalid product id",
+            data : null,
+        });
+    }
+
+    sendResponse(res, "Procduct Details");
+
+
+
+}
+
+const postReview = async(req, res) => {
+    req.body.productId = req.params.product_id;
+
+    [err, result ] = await to(ReviewValidator.newReview.validateAsync(req.body));
+    if(err){
+        return invalidPayloadError(res, err);
+    }
+    
+    [err, result] = await to(ReviewModel.create(req.body));
+
+    if(err){
+        return dbError(res, err);
+    }
+
+    return sendResponse(res, result);
+
+}
+
+const getProductReviews = async(req, res) => {
+    const pid = req.params.product_id;
+
+    let err, result;
+    if(!isNormalInteger(pid)){
+        return res.json({
+            success : false,
+            pid,
+            message : "Invalid product id",
+            data : null,
+        });
+    }
+
+    [err, result] = await to(ReviewModel.findAndCountAll({
+        where : {
+            productId : pid,
+        }
+    }) );
+
+    if(err){
+        return dbError(res, err);
+    }
+
+    return sendResponse(res, result);
+
+
+ }
+
 
 module.exports ={
     postProduct,
     getAllProducts,
     getProductById,
     getAllProductsWithCategoryId,
+    getProductReviews,
+    postReview,
+    getProductDetails,
 }
