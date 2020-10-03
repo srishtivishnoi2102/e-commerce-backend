@@ -1,6 +1,5 @@
 const { default: to } = require('await-to-js');
 const cartModel = require('../lib/datacentre/models/cart');
-const Product = require('../lib/datacentre/models/product');
 const ProductModel = require('../lib/datacentre/models/product');
 const { db } = require('../lib/datacentre/mysql');
 const { dbError, sendResponse } = require('../lib/utils/error_handler');
@@ -60,18 +59,41 @@ const getCartProducts = async(req, res) => {
 
     [err, result] = await to(
         cartModel.findAll({
+            attributes :{
+                exclude : ['id', 'customerId', 'productId'],
+            },
+            include : [{
+                model : ProductModel,
+                attributes : {
+                    exclude : ['id', 'categoryId', 'description'],
+                }         
+            }],
             where : {
                 customerId : cid,
             },
         })
     );
 
+    let totalSum = 0;
+    let qty, price;
+    for(let i=0;i<result.length; i++){
+        qty = parseInt(result[i].dataValues.quantity);
+        price = parseInt(result[i].dataValues.product.dataValues.price);
+        let calcPrice = qty*price;
+        result[i].dataValues.sumPrice = calcPrice;
+        totalSum += (calcPrice);
+    }
+
+    result.totalCartAmount = totalSum;
+    let data= {};
+    data.totalCartAmount = totalSum;
+    data.cartItems = result;
 
     if(err){
        return dbError(res, err);
     }
 
-    return sendResponse(res, result);
+    return sendResponse(res, data);
 
 };
 
@@ -166,6 +188,7 @@ const deleteProductFromCart = async(req, res) => {
     return sendResponse(res, result);
 
 };
+
 
 module.exports= {
     addProductToCard,
