@@ -40,7 +40,6 @@ const postProduct = async(req, res) => {
     }
 
     const pid = result.dataValues.id;
-    console.log(productDetails, pid);
 
 
    sendResponse(res, result);

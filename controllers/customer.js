@@ -182,22 +182,32 @@ const loginCustomer = async(req, res) => {
 }
 
 
-const getCustomerById = async(req, res) => {
+const getCustomerByIdService = async(req) => {
     let err, result;
     const id =parseInt(req.customer.id);
 
     [err, result] = await to(customerModel.findByPk(id,{
         attributes : {
-            exclude : ['id', 'isLoggedIn' , 'encryptPassword']
+            exclude : ['id', 'isLoggedIn' , 'encryptedPassword']
         }
     }));
+
+    if(err){
+       return err;
+    }
+
+    return result;
+
+};
+const getCustomerById = async(req, res) => {
+    let err, result;
+    [err, result] = await to(getCustomerByIdService(req));
 
 
     if(err){
         dbError(res, err);
     }
     
-    console.log("customer ",req.customer.id);
 
     sendResponse(res, result);
 
@@ -272,5 +282,6 @@ module.exports = {
     loginCustomer,
     updateCreditCard,
     getCustomerById,
+    getCustomerByIdService,
     updateAddress,
 }
