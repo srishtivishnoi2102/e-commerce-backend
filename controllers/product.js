@@ -143,51 +143,6 @@ const getProductDetails = async(req, res) => {
 
 }
 
-const postReview = async(req, res) => {
-    req.body.productId = req.params.product_id;
-
-    [err, result ] = await to(ReviewValidator.newReview.validateAsync(req.body));
-    if(err){
-        return invalidPayloadError(res, err);
-    }
-    
-    [err, result] = await to(ReviewModel.create(req.body));
-
-    if(err){
-        return dbError(res, err);
-    }
-
-    return sendResponse(res, result);
-
-}
-
-const getProductReviews = async(req, res) => {
-    const pid = req.params.product_id;
-
-    let err, result;
-    if(!isNormalInteger(pid)){
-        return res.json({
-            success : false,
-            pid,
-            message : "Invalid product id",
-            data : null,
-        });
-    }
-
-    [err, result] = await to(ReviewModel.findAndCountAll({
-        where : {
-            productId : pid,
-        }
-    }) );
-
-    if(err){
-        return dbError(res, err);
-    }
-
-    return sendResponse(res, result);
-
-
- }
 
 
 module.exports ={
@@ -195,7 +150,5 @@ module.exports ={
     getAllProducts,
     getProductById,
     getAllProductsWithCategoryId,
-    getProductReviews,
-    postReview,
     getProductDetails,
 }

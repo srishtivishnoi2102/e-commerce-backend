@@ -1,4 +1,5 @@
 const express = require('express');
+
 const customerRouter = require('./customer');
 const categoryRouter = require('./category');
 const productRouter = require('./product');
@@ -16,8 +17,6 @@ router.use('/product',productRouter);
 router.use('/cart', cartRouter);
 
 router.use('/order', orderRouter);
-
-
 
 
 module.exports =router;

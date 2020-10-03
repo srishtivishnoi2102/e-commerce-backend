@@ -1,6 +1,8 @@
-const express = require('express');
-const router = express.Router();
+const router = require('express').Router();
+
 const productController = require('../controllers/product');
+const reviewController = require('../controllers/review');
+
 const checkToken = require('../lib/middleware/authention');
 
 router.post('/', checkToken, productController.postProduct );
@@ -13,8 +15,8 @@ router.get('/inCategory/:category_id', productController.getAllProductsWithCateg
 
 router.get('/:product_id/details', productController.getProductDetails );
 
-router.get('/:product_id/reviews', productController.getProductReviews );
+router.get('/:product_id/reviews', reviewController.getProductReviews );
 
-router.post('/:product_id/reviews',checkToken, productController.postReview );
+router.post('/:product_id/reviews',checkToken, reviewController.postReview );
 
 module.exports = router;
