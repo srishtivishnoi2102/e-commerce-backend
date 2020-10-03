@@ -1,7 +1,7 @@
 const { default: to } = require("await-to-js");
-const { db } = require("../lib/datacentre/mysql");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+
 const { dbError, sendResponse, invalidPayloadError } = require("../lib/utils/error_handler");
 
 const customerValidator = require('../lib/PayloadValidation/customer');
@@ -10,7 +10,6 @@ const customerModel = require('../lib/datacentre/models/customer');
 
 const salt = process.env.SALT;
 const saltRounds =parseInt( process.env.SALT_ROUNDS);
-
 
 const generateJWToken = (customer) =>{
     
@@ -21,7 +20,6 @@ const generateJWToken = (customer) =>{
 
     return token;
 }
-
 
 const encryptPassword = async(password) => {
 
@@ -35,7 +33,6 @@ const encryptPassword = async(password) => {
 
 }
 
-
 const registerCustomer = async(req, res) => {
     let err, result;
     
@@ -44,8 +41,7 @@ const registerCustomer = async(req, res) => {
        return invalidPayloadError(res, err);
     }
 
-       // check if email already registered
-
+    // check if email already registered
     [err, result] = await to(customerModel.findAndCountAll({
         where : {
             email : req.body.email,
@@ -66,7 +62,6 @@ const registerCustomer = async(req, res) => {
    }
 
     // check if mobileNumber already registered
-
     [err, result] = await to(customerModel.findAndCountAll({
         where : {
             mobileNumber : req.body.mobileNumber,
@@ -85,9 +80,6 @@ const registerCustomer = async(req, res) => {
          
     }
 
-    console.log("find all & count  : : ",result.count);
-
-
 
     // password encrpytion
     const hashPassword  = await to ( encryptPassword(req.body.password));
@@ -95,29 +87,15 @@ const registerCustomer = async(req, res) => {
     delete req.body.password;
 
     // insert into db
-
     [err, result] =  await to(customerModel.create(req.body));
 
     if(err){
         return dbError(res, err);
     }
-
-    const customer= result.dataValues;
-    console.log("customer registered :: ",customer);
-
-    // logjn and return token
-    const token= generateJWToken({
-        id : customer.id ,
-        email : customer.email,
-        encryptedPassword : customer.encryptedPassword,
-
-    });
- 
-
-    return sendResponse(res, {
-        customer,
-        token,
-    });
+    delete result.dataValues.id;
+    delete result.dataValues.isLoggedIn;
+    delete result.dataValues.encryptPassword;
+    sendResponse(res, result)
 
 
 };
@@ -133,7 +111,6 @@ const loginCustomer = async(req, res) => {
      }
 
     // check if email already registered or not
-
     [err, result] = await to(customerModel.findOne({
         where : {
             email : req.body.email,
@@ -144,10 +121,9 @@ const loginCustomer = async(req, res) => {
         return dbError(res, err);
     }
 
-    console.log(result);
 
     if (!result){
-        console.log("Email not registered", result);
+        console.log("Email not registered", email);
 
         return res.json({
             success : false,
@@ -210,7 +186,11 @@ const getCustomerById = async(req, res) => {
     let err, result;
     const id =parseInt(req.customer.id);
 
-    [err, result] = await to(customerModel.findByPk(id));
+    [err, result] = await to(customerModel.findByPk(id,{
+        attributes : {
+            exclude : ['id', 'isLoggedIn' , 'encryptPassword']
+        }
+    }));
 
 
     if(err){

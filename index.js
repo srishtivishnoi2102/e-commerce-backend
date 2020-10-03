@@ -1,14 +1,17 @@
 const express = require('express');
 const bodyParser=require('body-parser');
+require('dotenv').config();
+
 const { db_connect } = require('./lib/datacentre/mysql');
+
 const routes = require('./routes/route');
-const Customer = require('./lib/datacentre/models/customer');
+
 const Cart = require('./lib/datacentre/models/cart');
 const Product = require('./lib/datacentre/models/product');
-const Category = require('./lib/datacentre/models/category');
-const Review = require('./lib/datacentre/models/review');
+const OrderItem = require('./lib/datacentre/models/orderItem');
+const Order = require('./lib/datacentre/models/order');
 
-require('dotenv').config();
+
 
 const app = express();
 
@@ -17,6 +20,7 @@ const app = express();
 // Model Asssociations
 
 Cart.belongsTo(Product);
+OrderItem.belongsTo(Order);
 
 
 app.use(express.json());

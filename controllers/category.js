@@ -13,7 +13,6 @@ const addCategory = async(req, res) =>{
     if(err){
         return invalidPayloadError(res, err);
     }
-    categoryModel.f
 
     [err, result ] = await to(categoryModel.create(req.body));
 

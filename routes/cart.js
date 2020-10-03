@@ -1,18 +1,20 @@
 const router = require('express').Router();
-const cart = require('../controllers/cart');
+
 const cartController = require('../controllers/cart');
+
 const checkToken = require('../lib/middleware/authention');
 
+router.use(checkToken); 
 
-router.post('/:product_id', checkToken, cartController.addProductToCard );
+router.post('/:product_id', cartController.addProductToCard );
 
-router.get('/', checkToken, cartController.getCartProducts);
+router.get('/', cartController.getCartProducts);
 
-router.put('/:product_id', checkToken, cart.updateCartProduct);
+router.put('/:product_id', cartController.updateCartProduct);
 
-router.delete('/', checkToken, cartController.deleteAllProductsFromCart);
+router.delete('/', cartController.deleteAllProductsFromCart);
 
-router.delete('/:product_id', checkToken, cart.deleteProductFromCart);
+router.delete('/:product_id',  cartController.deleteProductFromCart);
 
 
 module.exports = router;
