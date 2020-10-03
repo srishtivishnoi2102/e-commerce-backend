@@ -53,7 +53,7 @@ const addProductToCard = async(req, res) => {
 
 };
 
-const getCartProducts = async(req, res) => {
+const getCartProductService = async(req, res) => {
     const cid = req.customer.id;
     let err, result;
 
@@ -65,7 +65,7 @@ const getCartProducts = async(req, res) => {
             include : [{
                 model : ProductModel,
                 attributes : {
-                    exclude : ['id', 'categoryId', 'description'],
+                    exclude : ['categoryId', 'description'],
                 }         
             }],
             where : {
@@ -88,12 +88,17 @@ const getCartProducts = async(req, res) => {
     let data= {};
     data.totalCartAmount = totalSum;
     data.cartItems = result;
+    return data;
+}
 
+const getCartProducts = async(req, res) => {
+    
+    let [err, result] = await to(getCartProductService(req, res));
     if(err){
        return dbError(res, err);
     }
 
-    return sendResponse(res, data);
+    return sendResponse(res, result);
 
 };
 
@@ -193,6 +198,7 @@ const deleteProductFromCart = async(req, res) => {
 module.exports= {
     addProductToCard,
     getCartProducts,
+    getCartProductService,
     updateCartProduct,
     deleteAllProductsFromCart,
     deleteProductFromCart,
