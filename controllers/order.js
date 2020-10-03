@@ -8,8 +8,30 @@ const cartModel = require("../lib/datacentre/models/cart");
 const cartController = require('./cart');
 
 const { sendResponse, dbError } = require("../lib/utils/error_handler");
-const { isNormalInteger } = require("../lib/utils/helper");
+const { isNormalInteger, getOrderDates } = require("../lib/utils/helper");
+const { getCustomerByIdService } = require("./customer");
 
+const checkAddressCreditCardService = async(req, res) => {
+    let [err, result ] =await to(getCustomerByIdService(req));
+    
+    if(err){
+        return err;
+    }
+    if(!result.dataValues.address){
+        res.json({
+            success : false,
+            message : "Empty address, update it before placing order"
+        });
+        return false;
+   }else if(!result.dataValues.creditCardNumber){
+        res.json({
+            success : false,
+            message : "No Card details available, update it before placing order"
+        });
+        return false;
+    }
+    return true;
+}
 
 const orderNowProduct = async(req, res) => {
     const cid = req.customer.id;
@@ -22,6 +44,14 @@ const orderNowProduct = async(req, res) => {
         });
     }
     let err, result;
+
+    [err, result]= await to(checkAddressCreditCardService(req,res));
+    if(err){
+        return dbError(res, err);
+    }else if(!result){
+        return;
+    }
+
     [err, result] = await to(
         productModel.findByPk(pid,{
             attributes : ['price']
@@ -30,12 +60,17 @@ const orderNowProduct = async(req, res) => {
     if(err){
         return dbError(res, err);
     }
-    const productPrice = result.dataValues.price;
 
+
+
+    const productPrice = result.dataValues.price;
+    const dates = getOrderDates();
     [err, result] = await to(
         orderModel.create({
             customerId: cid,
             amount : productPrice,
+            orderDate : dates.orderDate,
+            deliveryDate : dates.deliveryDate,
         })
     );
 
@@ -55,7 +90,7 @@ const orderNowProduct = async(req, res) => {
     if(err){
         return dbError(res, err);
     }
-
+    result.dataValues.amount =productPrice;
     
     return sendResponse(res, result);
 
@@ -70,6 +105,10 @@ const getAllOrdersOfCustomer = async(req, res) => {
             attributes :{
                 exclude : ['id', 'customerId']
             },
+            include :[{
+                model : orderItemModel,
+                attributes :  ['quantity', 'productId'],
+            }],
             where : {
                 customerId : cid,
             }
@@ -78,6 +117,9 @@ const getAllOrdersOfCustomer = async(req, res) => {
     if(err){
         return dbError(res, err);
     }
+
+    
+    
     return sendResponse(res, result);
 
 }
@@ -139,20 +181,28 @@ const getOrderDetails = async(req, res) => {
 }
 
 const placeOrderFromCart = async(req, res) => {
-    console.log("cart order");
     const cid = req.customer.id;
     let err, result;
 
+    [err, result]= await to(checkAddressCreditCardService(req,res));
+    if(err){
+        return dbError(res, err);
+    }else if(!result){
+        return;
+    }
+
     [err, result] = await to(cartController.getCartProductService(req,res));
-    console.log("result-->> ",result);
-    // sendResponse(res, result);
     
+    const dates = getOrderDates();
     const orderAmount = result.totalCartAmount;
     const cartItems = result.cartItems;
     [err, result] = await to(
         orderModel.create({
             customerId: cid,
             amount : orderAmount,
+            orderDate : dates.orderDate,
+            deliveryDate : dates.deliveryDate,
+
         })
     );
 
