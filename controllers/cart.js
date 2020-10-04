@@ -123,6 +123,9 @@ const updateCartProduct = async(req, res) => {
             data : null,
         });
     }
+    if(parseInt(qty)==0){
+        return deleteProductFromCart(req, res);
+    }
 
     let err, result;
 

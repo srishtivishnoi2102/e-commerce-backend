@@ -1,8 +1,8 @@
-const ProductModel = require("../lib/datacentre/models/product");
-const ReviewModel = require("../lib/datacentre/models/review");
-const ProductValidator = require("../lib/PayloadValidation/product");
-const ReviewValidator = require("../lib/PayloadValidation/review");
 const { default: to } = require("await-to-js");
+
+const ProductModel = require("../lib/datacentre/models/product");
+const ProductValidator = require("../lib/PayloadValidation/product");
+
 const { invalidPayloadError, dbError, sendResponse } = require("../lib/utils/error_handler");
 const { isNormalInteger } = require("../lib/utils/helper");
 
@@ -50,7 +50,10 @@ const getAllProducts = async(req, res) => {
     let err, result;
 
     
-    [err, result] = await to(ProductModel.findAndCountAll() );
+    [err, result] = await to(ProductModel.findAndCountAll({
+        attributes : {exclude : ['id'] },
+    }
+    ) );
 
     if(err){
         return dbError(res, err);
@@ -105,6 +108,7 @@ const getAllProductsWithCategoryId = async(req, res) => {
     let err, result;
 
     [err, result ]= await to(ProductModel.findAndCountAll({
+        attributes : {exclude : ['id'] },
         where: {
             categoryId : cid,
         }
