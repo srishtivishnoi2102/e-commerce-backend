@@ -94,7 +94,7 @@ const registerCustomer = async(req, res) => {
     }
     delete result.dataValues.id;
     delete result.dataValues.isLoggedIn;
-    delete result.dataValues.encryptPassword;
+    delete result.dataValues.encryptedPassword;
     sendResponse(res, result)
 
 

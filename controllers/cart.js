@@ -127,6 +127,9 @@ const updateCartProduct = async(req, res) => {
         return deleteProductFromCart(req, res);
     }
 
+
+
+
     let err, result;
 
     [err, result] = await to(
