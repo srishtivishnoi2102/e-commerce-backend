@@ -28,7 +28,6 @@ Order.belongsTo(Customer);
 
 
 
-
 app.use(express.json());
 app.use(bodyParser.json());
 

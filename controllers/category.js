@@ -40,7 +40,7 @@ const getCategories = async(req, res) => {
 
 const getCategoryById = async(req, res) => {
     let id;
-    id =  parseInt(req.params.category_id);
+    id =  req.params.category_id;
    
 
     if(!isNormalInteger(id)){
@@ -71,7 +71,7 @@ const getCategoryById = async(req, res) => {
 
 const getCategoriesOfProduct = async(req, res) => {
     let id;
-    id =  parseInt(req.params.product_id);
+    id =  req.params.product_id;
     
     if(!isNormalInteger(id)){
         return res.json({
@@ -84,7 +84,7 @@ const getCategoriesOfProduct = async(req, res) => {
     let err, result;
 
     [err, result ]= await to(ProductModel.findByPk(id));
-    
+
     if(err){
         return dbError(res, err);
     }
@@ -95,7 +95,7 @@ const getCategoriesOfProduct = async(req, res) => {
             data : null,
         });
     }
-    req.params.category_id = result.dataValues.categoryId;
+    req.params.category_id = result.dataValues.categoryId.toString();
     return getCategoryById(req, res);
 }
 
