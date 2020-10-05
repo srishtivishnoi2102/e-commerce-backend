@@ -8,6 +8,7 @@ I have provided APIs for customers, products and their categories along with pla
 
 The APIs are written using Express (Node.js) and MySql Database with the help of Sequelize ORM. I have implemented token based authentication using JWT. The APIs perform the payload validation by making of JOI Library.
 
+## Checkout the Demo on [youtube](https://youtu.be/VJu8yIPkGEU)
 
 ## Setup Instructions :page_facing_up:
 ### 1.) Install and setup Node on your system
