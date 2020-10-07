@@ -6,32 +6,9 @@ const { dbError, sendResponse, invalidPayloadError } = require("../lib/utils/err
 
 const customerValidator = require('../lib/PayloadValidation/customer');
 const customerModel = require('../lib/datacentre/models/customer');
+const CustomerService = require("../services/customer");
 
 
-const salt = process.env.SALT;
-const saltRounds =parseInt( process.env.SALT_ROUNDS);
-
-const generateJWToken = (customer) =>{
-    
-    const token = jwt.sign(customer, salt, {
-        expiresIn : 24*60*60,
-    });
-    // console.log("Toekn generated: ", token);
-
-    return token;
-}
-
-const encryptPassword = async(password) => {
-
-    const [err,encryptedPassword] = await to(bcrypt.hash(password, saltRounds));
-
-    if(err){
-        console.log("Error while generating password hash",{error:err});
-        throw Error('Error while generating password hash');
-    }
-    return encryptedPassword;
-
-}
 
 const registerCustomer = async(req, res) => {
     let err, result;
@@ -42,19 +19,14 @@ const registerCustomer = async(req, res) => {
     }
 
     // check if email already registered
-    [err, result] = await to(customerModel.findAndCountAll({
-        where : {
-            email : req.body.email,
-        }
-    }) );
+    [err, result] = await to(CustomerService.checkIfEmailRegistered(req.body.email));
 
     if(err){
         return dbError(res, err);
     }
 
-    console.log("find all & count  : : ",result.count);
 
-    if (result.count){
+    if (result[0]){
         return res.json({
             success : false,
             message : "Email already registered"
@@ -62,17 +34,13 @@ const registerCustomer = async(req, res) => {
    }
 
     // check if mobileNumber already registered
-    [err, result] = await to(customerModel.findAndCountAll({
-        where : {
-            mobileNumber : req.body.mobileNumber,
-        }
-    }) );
+    [err, result] = await to(CustomerService.checkIfMobileRegistered(req.body.mobileNumber));
 
     if(err){
         return dbError(res, err);
     }
 
-    if (result.count){
+    if (result){
          return res.json({
              success : false,
              message : "Mobile Number already registered"
@@ -81,20 +49,13 @@ const registerCustomer = async(req, res) => {
     }
 
 
-    // password encrpytion
-    const hashPassword  = await to ( encryptPassword(req.body.password));
-    req.body.encryptedPassword = hashPassword[1];
-    delete req.body.password;
-
-    // insert into db
-    [err, result] =  await to(customerModel.create(req.body));
+    [err, result] =  await to(CustomerService.signUpCustomer(req.body));
 
     if(err){
         return dbError(res, err);
     }
-    delete result.dataValues.id;
-    delete result.dataValues.isLoggedIn;
-    delete result.dataValues.encryptedPassword;
+    
+    
     sendResponse(res, result)
 
 
@@ -111,74 +72,41 @@ const loginCustomer = async(req, res) => {
      }
 
     // check if email already registered or not
-    [err, result] = await to(customerModel.findOne({
-        where : {
-            email : req.body.email,
-        }
-    }) );
+    [err, result] = await to(
+        CustomerService.checkIfEmailRegistered(req.body.email)
+    );
 
     if(err){
         return dbError(res, err);
     }
 
-
-    if (!result){
-        console.log("Email not registered", email);
-
+    if (!result[0]){
         return res.json({
             success : false,
             message : "Email not registered, please register first."
         });
    }
+   let customer = result[1];
+   const enteredPassword = req.body.password;
 
-   const id = result.dataValues.id;
-   const encryptedPassword= result.dataValues.encryptedPassword;
-   console.log("password: ",req.body.password);
-   console.log("encryptedPassword: ",encryptedPassword);
-    let isValid;
-    [ err, isValid] = await to( bcrypt.compare(password, encryptedPassword));
-    console.log("Is valid:",isValid);
-    if(!isValid){    
-        return  res.json({
-            success :false,
-            msg:"Password is incorrect"
-
-        }); 
-    }
-
-    
-
-    let customer={
-        id : id,
-        email: req.body.email,
-        encryptedPassword :encryptedPassword
-    };
-
-    [err, result] = await to (customerModel.update({
-        isLoggedIn : true,
-    },{
-        where : {
-            email : req.body.email,
-        }
-    }))
-
-    if(err){
-        return  res.json({
-            success :false,
-            msg:"Error in Login",
-            err : err
-
-        }); 
-    }
-
-    const token=generateJWToken(customer);
+   [err, result] = await to(CustomerService.signInAndGenerateToken(customer , enteredPassword));
+   console.log(err, result);
+   if(err){
+       return  res.json({
+           success : false,
+           message : err.message
+       });
+   }
+   if(result.err){
     return  res.json({
-        success : true,
-        token
+        success : false,
+        message : result.err.message
     });
-
-   
-
+   }
+   return res.json({
+       success : true,
+       token : result.token
+   });
 }
 
 
@@ -199,15 +127,16 @@ const getCustomerByIdService = async(req) => {
     return result;
 
 };
+
+
 const getCustomerById = async(req, res) => {
     let err, result;
-    [err, result] = await to(getCustomerByIdService(req));
-
+    const cid =parseInt(req.customer.id);
+    [err, result] = await to(CustomerService.getCustomerById(cid));
 
     if(err){
         dbError(res, err);
     }
-    
 
     sendResponse(res, result);
 
@@ -223,19 +152,11 @@ const updateCreditCard = async(req, res) => {
         return invalidPayloadError(res, err);
      }
 
-    [err, result] = await to(customerModel.update({
-        creditCardNumber : creditCardNumber,
-    },{
-        where:{
-            id : req.customer.id,
-        }
-    },    
-    ));
-
+    [err, result] = await to(CustomerService.updateCreditCard(req.customer.id, creditCardNumber));
     if(err){
         return dbError(res, err);
     }
-
+    
     return  res.json({
         data : result,
         success : true,
@@ -255,14 +176,7 @@ const updateAddress = async(req, res) => {
         return invalidPayloadError(res, err);
      }
 
-    [err, result] = await to(customerModel.update({
-        address : address,
-    },{
-        where:{
-            id : req.customer.id,
-        }
-    },    
-    ));
+    [err, result] = await to(CustomerService.updateAddress(req.customer.id, address));
 
     if(err){
         return dbError(res, err);
