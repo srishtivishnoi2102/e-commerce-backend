@@ -128,8 +128,6 @@ const updateCartProduct = async(req, res) => {
     }
 
 
-
-
     let err, result;
 
     [err, result] = await to(
@@ -145,6 +143,9 @@ const updateCartProduct = async(req, res) => {
     if(err){
         return dbError(res, err);
     }
+    result = {
+        message : "Updated product quantity successfully",
+    };
     return sendResponse(res, result);
 
 };
@@ -195,7 +196,14 @@ const deleteProductFromCart = async(req, res) => {
     if(err){
        return dbError(res, err);
     }
+    if(result==0){
+        return  res.json({
+            success :false,
+            message : "This product is not present in cart"
+        });
+    }
 
+    console.log(result);
     return sendResponse(res, result);
 
 };
