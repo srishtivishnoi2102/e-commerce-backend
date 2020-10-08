@@ -4,13 +4,14 @@ const ProductModel = require('../lib/datacentre/models/product');
 const { db } = require('../lib/datacentre/mysql');
 const { dbError, sendResponse } = require('../lib/utils/error_handler');
 const { isNormalInteger } = require('../lib/utils/helper');
+const CartService = require('../services/cart');
 
 const addProductToCard = async(req, res) => {
 
-    const cid = req.customer.id;
-    const pid = req.params.product_id;
+    const customerId = req.customer.id;
+    const productId = req.params.product_id;
     
-    if(!isNormalInteger(pid)){
+    if(!isNormalInteger(productId)){
         return res.json({
             success : false,
             message : "Invalid product id",
@@ -19,40 +20,27 @@ const addProductToCard = async(req, res) => {
     }
     let err, result;
     [err, result ]= await to(
-        cartModel.findAndCountAll({
-            where : {
-                customerId : cid,
-                productId : pid,
-            }
-        })
+        CartService.checkIfProductExistsinCart(customerId, productId)
     );
 
     if(err){
         return dbError(res, err);
     }
-    if(result.count){    
-        let qty = parseInt(result.rows[0].dataValues.quantity);
-        console.log("update qyantity only");
-        //  update quantity only
-        req.body.quantity = qty +1;
-        return updateCartProduct(req, res);
-        
 
+    if(!result){
+        [err, result]= await to(CartService.addNewProductToCard(customerId, productId));
     }else{
-        [err, result ] = await to(cartModel.create({
-            customerId : cid,
-            productId : pid,
-        }));
-
-        if(err){
-            dbError(res, err);
-            
-        }
-        sendResponse(res, result);
+        let qty = 1 + parseInt(result.quantity);
+        [err, result]= await to(CartService.updateCartProductQuantity(customerId, productId, qty));
     }
 
+    if(err){
+        return dbError(res, err);
+    }
+    return sendResponse(res, result);
 };
 
+//  to be removed later
 const getCartProductService = async(req, res) => {
     const cid = req.customer.id;
     let err, result;
@@ -92,8 +80,9 @@ const getCartProductService = async(req, res) => {
 }
 
 const getCartProducts = async(req, res) => {
-    
-    let [err, result] = await to(getCartProductService(req, res));
+    const customerId = req.customer.id;
+
+    let [err, result] = await to(CartService.getCartProducts(customerId));
     if(err){
        return dbError(res, err);
     }
@@ -104,11 +93,11 @@ const getCartProducts = async(req, res) => {
 
 const updateCartProduct = async(req, res) => {
     
-    const cid = req.customer.id;
-    const pid = req.params.product_id;
+    const customerId = req.customer.id;
+    const productId = req.params.product_id;
     let qty = req.body.quantity.toString();
     
-    if(!isNormalInteger(pid)){
+    if(!isNormalInteger(productId)){
         return res.json({
             success : false,
             message : "Invalid product id",
@@ -123,58 +112,46 @@ const updateCartProduct = async(req, res) => {
             data : null,
         });
     }
-    if(parseInt(qty)==0){
-        return deleteProductFromCart(req, res);
-    }
-
-
     let err, result;
 
-    [err, result] = await to(
-        cartModel.update({
-            quantity : qty,
-        }, {
-            where : {
-                customerId : cid,
-                productId : pid,
-            }
-        })
-    )
+    if(parseInt(qty)==0){
+        [err, result]= await to(CartService.deleteProductFromCart(customerId, productId));
+
+    }else{
+        [err, result]= await to(CartService.updateCartProductQuantity(customerId, productId, qty));
+    }
+
+    
     if(err){
         return dbError(res, err);
     }
-    result = {
-        message : "Updated product quantity successfully",
-    };
+
     return sendResponse(res, result);
 
 };
 
 const deleteAllProductsFromCart = async(req, res) => {
-    const cid = req.customer.id;
+    const customerId = req.customer.id;
     let err, result;
 
     [err, result] = await to(
-        cartModel.destroy({
-            where : {
-                customerId : cid,
-            },
-        })
+        CartService.deleteAllProductsFromCart(customerId)
     );
 
 
     if(err){
        return dbError(res, err);
     }
+    result = {message :"Successfully deleted all products from cart"};
 
     return sendResponse(res, result);
 };
 
 const deleteProductFromCart = async(req, res) => {
-    const cid = req.customer.id;
-    const pid = req.params.product_id;
+    const customerId = req.customer.id;
+    const productId = req.params.product_id;
     
-    if(!isNormalInteger(pid)){
+    if(!isNormalInteger(productId)){
         return res.json({
             success : false,
             message : "Invalid product id",
@@ -184,12 +161,7 @@ const deleteProductFromCart = async(req, res) => {
     let err, result;
 
     [err, result] = await to(
-        cartModel.destroy({
-            where : {
-                customerId : cid,
-                productId : pid,
-            },
-        })
+       CartService.deleteProductFromCart(customerId, productId)
     );
 
 
@@ -202,7 +174,7 @@ const deleteProductFromCart = async(req, res) => {
             message : "This product is not present in cart"
         });
     }
-
+    result = {message :"Successfully deleted product from cart"};
     console.log(result);
     return sendResponse(res, result);
 
