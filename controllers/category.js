@@ -2,10 +2,9 @@ const { default: to } = require("await-to-js");
 const { dbError, sendResponse, invalidPayloadError } = require("../lib/utils/error_handler");
 const { isNormalInteger } = require("../lib/utils/helper");
 
-
 const categoryValidator = require('../lib/PayloadValidation/category');
-const categoryModel = require('../lib/datacentre/models/category');
-const ProductModel = require('../lib/datacentre/models/product');
+const CategoryService = require("../services/category");
+const ProductService = require("../services/product");
 
 const addCategory = async(req, res) =>{
     let err, result;
@@ -14,7 +13,7 @@ const addCategory = async(req, res) =>{
         return invalidPayloadError(res, err);
     }
 
-    [err, result ] = await to(categoryModel.create(req.body));
+    [err, result ] = await to(CategoryService.addCategory(req.body));
 
     if(err){
         return dbError(res, err);
@@ -28,7 +27,7 @@ const addCategory = async(req, res) =>{
 const getCategories = async(req, res) => {
     let err, result;
 
-    [err, result ]= await to(categoryModel.findAll());
+    [err, result ]= await to(CategoryService.getCategories());
 
     if(err){
         return dbError(res, err);
@@ -39,20 +38,21 @@ const getCategories = async(req, res) => {
 }
 
 const getCategoryById = async(req, res) => {
-    let id;
-    id =  req.params.category_id;
+    let categoryId;
+    categoryId =  req.params.category_id;
    
 
-    if(!isNormalInteger(id)){
+    if(!isNormalInteger(categoryId)){
         return res.json({
             success : false,
             message : "Invalid category id",
             data : null,
         });
     }
+
     let err, result;
 
-    [err, result ]= await to(categoryModel.findByPk(id));
+    [err, result ]= await to(CategoryService.getCategoryById(categoryId));
     
     if(err){
         return dbError(res, err);
@@ -70,10 +70,10 @@ const getCategoryById = async(req, res) => {
 }
 
 const getCategoriesOfProduct = async(req, res) => {
-    let id;
-    id =  req.params.product_id;
+    let productId;
+    productId =  req.params.product_id;
     
-    if(!isNormalInteger(id)){
+    if(!isNormalInteger(productId)){
         return res.json({
             success : false,
             message : "Invalid product id",
@@ -83,7 +83,8 @@ const getCategoriesOfProduct = async(req, res) => {
     
     let err, result;
 
-    [err, result ]= await to(ProductModel.findByPk(id));
+    [err, result ]= await to(ProductService.getCategoryIdOfProduct(productId));
+
 
     if(err){
         return dbError(res, err);
@@ -91,10 +92,11 @@ const getCategoriesOfProduct = async(req, res) => {
     if(!result){
         return  res.json({
             success : false, 
-            message : "NO product exists with product id "+id,
+            message : "NO product exists with product id "+productId,
             data : null,
         });
     }
+    // const categoryId = result.dataValues.categoryId;
     req.params.category_id = result.dataValues.categoryId.toString();
     return getCategoryById(req, res);
 }
@@ -106,5 +108,3 @@ module.exports ={
     getCategoryById,
     getCategoriesOfProduct,
 }
-
-//router.get('/inProduct/:product_id',checkToken, categoryController.getCategoriesOfProduct );
