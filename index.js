@@ -22,7 +22,7 @@ const app = express();
 
 Cart.belongsTo(Product);
 OrderItem.belongsTo(Order);
-OrderItem.hasMany(Product, {foreignKey: 'id'});
+// OrderItem.hasMany(Product, {foreignKey: 'id'});
 Order.hasMany(OrderItem);
 Order.belongsTo(Customer);
 
