@@ -89,7 +89,7 @@ class CartService {
         let err, result;
 
         [err, result] = await to(
-            cartModel.upsert({
+            cartModel.update({
                 customerId : customerId,
                 productId : productId,
                 quantity : qty,

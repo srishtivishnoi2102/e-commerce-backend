@@ -30,6 +30,31 @@ const encryptPassword = async(password) => {
 
 class CustomerService{
 
+    static checkAddressCreditCardAvailable = async(customerId) => {
+        let [err, result ] =await to(
+            this.getCustomerById(customerId)
+        );
+        
+        if(err){
+            return err;
+        }
+        if(!result.dataValues.address){
+            res.json({
+                success : false,
+                message : "Empty address, update it before placing order"
+            });
+            return false;
+       }else if(!result.dataValues.creditCardNumber){
+            res.json({
+                success : false,
+                message : "No Card details available, update it before placing order"
+            });
+            return false;
+        }
+        return true;
+
+    }
+
     static checkIfEmailRegistered = async(email) => {
         let err, result;
         // it check if email already registered
