@@ -1,0 +1,1 @@
+{"name":"SequelizeConnectionRefusedError","parent":{"errno":"ECONNREFUSED","code":"ECONNREFUSED","syscall":"connect","address":"127.0.0.1","port":3306,"fatal":true},"original":{"errno":"ECONNREFUSED","code":"ECONNREFUSED","syscall":"connect","address":"127.0.0.1","port":3306,"fatal":true},"level":"error"}

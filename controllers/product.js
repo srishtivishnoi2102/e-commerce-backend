@@ -1,4 +1,5 @@
 const { default: to } = require("await-to-js");
+const logger = require("../lib/logging");
 
 const ProductValidator = require("../lib/PayloadValidation/product");
 
@@ -29,22 +30,23 @@ const postProduct = async(req, res) => {
 
 const getAllProducts = async(req, res) => {
     let err, result;
-
     
     [err, result] = await to(ProductService.getAllProducts());
 
     if(err){
+        logger.error(err);
         return dbError(res, err);
     }
 
 
     if (!result.count){
+        logger.info("No product exits")
         return res.json({
             success : false,
             message : "No Product exists",
         }); 
    }
-
+   logger.info("Fetched all products successfully");
    sendResponse(res, result);
 
 }
@@ -61,8 +63,8 @@ const getProductById = async(req, res) => {
         });
     }
     [err, result ]= await to(ProductService.getProductById(productId));
-    
     if(err){
+        logger.error(err);
         return dbError(res, err);
     }
     if(!result){

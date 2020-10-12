@@ -1,6 +1,7 @@
 const { default: to } = require("await-to-js");
 
 const ProductModel = require("../lib/datacentre/models/product");
+const logger = require("../lib/logging");
 
 class ProductService {
 
@@ -39,8 +40,8 @@ class ProductService {
             attributes : {exclude : ['id'] },
         }
         ));
-    
         if(err){
+            logger.error(err);
             return err;
         }    
         return result;

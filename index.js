@@ -11,12 +11,13 @@ const Product = require('./lib/datacentre/models/product');
 const OrderItem = require('./lib/datacentre/models/orderItem');
 const Order = require('./lib/datacentre/models/order');
 const Customer = require('./lib/datacentre/models/customer');
+const logger = require('./lib/logging');
 
 
 
 const app = express();
 
-db_connect();
+// db_connect();
 
 // Model Asssociations
 
@@ -35,5 +36,5 @@ app.use('/', routes);
 
 const PORT = process.env.PORT || 3040;
 app.listen(PORT, () => {
-    console.log(`Server started on port`);
+    logger.info(`Server started on port {PORT} `);
 });

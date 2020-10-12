@@ -1,0 +1,16 @@
+{"message":"Server started on port {PORT} ","level":"info","timestamp":"2020-10-12T10:22:59.437Z"}
+{"message":"Server started on port {PORT} ","level":"info","timestamp":"2020-10-12T10:24:37.198Z"}
+{"message":"Fetched all products successfully","level":"info","timestamp":"2020-10-12T10:25:14.117Z"}
+{"message":"No product exits","level":"info","timestamp":"2020-10-12T10:30:27.679Z"}
+{"message":"Server started on port {PORT} ","level":"info","timestamp":"2020-10-12T10:31:45.132Z"}
+{"message":"Server started on port {PORT} ","level":"info","timestamp":"2020-10-12T10:32:52.960Z"}
+{"message":"No product exits","level":"info","timestamp":"2020-10-12T10:33:02.822Z"}
+{"message":"Server started on port {PORT} ","level":"info","timestamp":"2020-10-12T10:33:27.645Z"}
+{"message":"No product exits","level":"info","timestamp":"2020-10-12T10:33:29.721Z"}
+{"message":"Server started on port {PORT} ","level":"info","timestamp":"2020-10-12T10:34:20.358Z"}
+{"message":"Server started on port {PORT} ","level":"info","timestamp":"2020-10-12T10:34:31.859Z"}
+{"message":"Server started on port {PORT} ","level":"info","timestamp":"2020-10-12T10:34:35.980Z"}
+{"message":"No product exits","level":"info","timestamp":"2020-10-12T10:34:39.678Z"}
+{"message":"Server started on port {PORT} ","level":"info","timestamp":"2020-10-12T10:38:17.831Z"}
+{"name":"SequelizeConnectionRefusedError","parent":{"errno":"ECONNREFUSED","code":"ECONNREFUSED","syscall":"connect","address":"127.0.0.1","port":3306,"fatal":true},"original":{"errno":"ECONNREFUSED","code":"ECONNREFUSED","syscall":"connect","address":"127.0.0.1","port":3306,"fatal":true},"level":"error","timestamp":"2020-10-12T10:38:20.204Z"}
+{"message":"No product exits","level":"info","timestamp":"2020-10-12T10:38:20.210Z"}
