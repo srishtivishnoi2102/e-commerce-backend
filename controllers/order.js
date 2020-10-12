@@ -1,14 +1,8 @@
 const { default: to } = require("await-to-js");
 
-const orderModel = require('../lib/datacentre/models/order');
-const orderItemModel = require('../lib/datacentre/models/orderItem');
-const productModel = require('../lib/datacentre/models/product');
-const cartModel = require("../lib/datacentre/models/cart");
-
-const cartController = require('./cart');
-
 const { sendResponse, dbError } = require("../lib/utils/error_handler");
 const { isNormalInteger } = require("../lib/utils/helper");
+
 const OrderService = require("../services/order");
 const CustomerService = require("../services/customer");
 const CartService = require("../services/cart");
@@ -48,6 +42,7 @@ const orderNowProduct = async(req, res) => {
             message : "Product does not exist",
         });
     }
+    
 
 
     const orderAmount = result.dataValues.price;
@@ -146,7 +141,7 @@ const placeOrderFromCart = async(req, res) => {
         return;
     }
 
-    [err, result] = await to(cartController.getCartProductService(req,res));
+    [err, result] = await to(CartService.getCartProducts(customerId));
         
     const orderAmount = result.totalCartAmount;
     const cartItems = result.cartItems;

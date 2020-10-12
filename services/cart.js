@@ -2,8 +2,6 @@ const { default: to } = require('await-to-js');
 
 const cartModel = require('../lib/datacentre/models/cart');
 const ProductModel = require('../lib/datacentre/models/product');
-const error_handler = require('../lib/utils/error_handler');
-
 
 class CartService {
 

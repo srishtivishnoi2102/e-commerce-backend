@@ -1,7 +1,6 @@
 const { default: to } = require("await-to-js");
 
 const categoryModel = require('../lib/datacentre/models/category');
-const ProductModel = require('../lib/datacentre/models/product');
 
 class CategoryService {
     static addCategory = async(product) =>{

@@ -1,9 +1,8 @@
 const { default: to } = require('await-to-js');
-const cartModel = require('../lib/datacentre/models/cart');
-const ProductModel = require('../lib/datacentre/models/product');
-const { db } = require('../lib/datacentre/mysql');
+
 const { dbError, sendResponse } = require('../lib/utils/error_handler');
 const { isNormalInteger } = require('../lib/utils/helper');
+
 const CartService = require('../services/cart');
 
 const addProductToCard = async(req, res) => {
@@ -40,44 +39,6 @@ const addProductToCard = async(req, res) => {
     return sendResponse(res, result);
 };
 
-//  to be removed later
-const getCartProductService = async(req, res) => {
-    const cid = req.customer.id;
-    let err, result;
-
-    [err, result] = await to(
-        cartModel.findAll({
-            attributes :{
-                exclude : ['id', 'customerId', 'productId'],
-            },
-            include : [{
-                model : ProductModel,
-                attributes : {
-                    exclude : ['categoryId', 'description'],
-                }         
-            }],
-            where : {
-                customerId : cid,
-            },
-        })
-    );
-
-    let totalSum = 0;
-    let qty, price;
-    for(let i=0;i<result.length; i++){
-        qty = parseInt(result[i].dataValues.quantity);
-        price = parseInt(result[i].dataValues.product.dataValues.price);
-        let calcPrice = qty*price;
-        result[i].dataValues.sumPrice = calcPrice;
-        totalSum += (calcPrice);
-    }
-
-    result.totalCartAmount = totalSum;
-    let data= {};
-    data.totalCartAmount = totalSum;
-    data.cartItems = result;
-    return data;
-}
 
 const getCartProducts = async(req, res) => {
     const customerId = req.customer.id;
@@ -184,7 +145,6 @@ const deleteProductFromCart = async(req, res) => {
 module.exports= {
     addProductToCard,
     getCartProducts,
-    getCartProductService,
     updateCartProduct,
     deleteAllProductsFromCart,
     deleteProductFromCart,
