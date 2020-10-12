@@ -2,7 +2,6 @@ const { default: to } = require("await-to-js");
 
 const ProductModel = require("../lib/datacentre/models/product");
 
-
 class ProductService {
 
     static getCategoryIdOfProduct = async(productId) => {

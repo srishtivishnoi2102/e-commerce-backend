@@ -1,11 +1,10 @@
 const { default: to } = require("await-to-js");
 
-const ProductModel = require("../lib/datacentre/models/product");
 const ProductValidator = require("../lib/PayloadValidation/product");
-
 
 const { invalidPayloadError, dbError, sendResponse } = require("../lib/utils/error_handler");
 const { isNormalInteger } = require("../lib/utils/helper");
+
 const ProductService = require("../services/product");
 
 const postProduct = async(req, res) => {
@@ -37,6 +36,7 @@ const getAllProducts = async(req, res) => {
     if(err){
         return dbError(res, err);
     }
+
 
     if (!result.count){
         return res.json({
@@ -76,7 +76,6 @@ const getProductById = async(req, res) => {
     return sendResponse(res, result);
 
 }
-
 
 const getAllProductsWithCategoryId = async(req, res) => {
     
@@ -127,8 +126,6 @@ const getProductDetails = async(req, res) => {
 
 
 }
-
-
 
 module.exports ={
     postProduct,

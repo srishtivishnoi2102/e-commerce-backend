@@ -16,7 +16,7 @@ const Customer = require('./lib/datacentre/models/customer');
 
 const app = express();
 
-// db_connect();
+db_connect();
 
 // Model Asssociations
 
