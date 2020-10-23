@@ -1,6 +1,6 @@
 # e-commerce-backend
 
-This repository contains the code pf APIs for Backend of E-commerce system. 
+This repository contains the code of APIs for Backend of E-commerce system. 
 As the wikipedia says, E-commerce is the activity of electronically buying or selling of products on online services or over the Internet.
 I have provided APIs for customers, products and their categories along with placing order. We can directly buy product or can checkout cart for ordering all products from cart.
 
